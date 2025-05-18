@@ -1,0 +1,95 @@
+{
+  "services": [
+    {
+      "name": "metatool-web",
+      "image": "${APP_DATA_DIR}/build/metatool-web:latest",
+      "internalPort": 3000,
+      "isMain": true,
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data",
+          "containerPath": "/app/data"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/logs",
+          "containerPath": "/app/logs"
+        }
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "DATABASE_URL": "postgresql://metatool:m3t4t00l@metatool-postgres:5432/metatool"
+      },
+      "extraHosts": [
+        "host.docker.internal:host-gateway"
+      ],
+      "dependsOn": "metatool-postgres",
+      "restart": "always"
+    },
+    {
+      "name": "metatool-remote-hosting",
+      "image": "${APP_DATA_DIR}/build/metatool-remote-hosting:latest",
+      "internalPort": 12007,
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data",
+          "containerPath": "/app/data"
+        }
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "METATOOL_API_URL": "http://metatool-web:3000"
+      },
+      "addPorts": [
+        {
+          "containerPort": 12007,
+          "hostPort": 12007
+        }
+      ],
+      "extraHosts": [
+        "host.docker.internal:host-gateway"
+      ],
+      "restart": "always"
+    },
+    {
+      "name": "metatool-postgres",
+      "image": "postgres:16.2-alpine3.18",
+      "environment": {
+        "POSTGRES_DB": "metatool",
+        "POSTGRES_USER": "metatool",
+        "POSTGRES_PASSWORD": "m3t4t00l"
+      },
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/postgres",
+          "containerPath": "/var/lib/postgresql/data"
+        }
+      ],
+      "addPorts": [
+        {
+          "containerPort": 5432,
+          "hostPort": 8432
+        }
+      ],
+      "healthCheck": {
+        "test": "pg_isready -U metatool",
+        "interval": "5s",
+        "timeout": "5s",
+        "retries": 3
+      },
+      "restart": "always"
+    },
+    {
+      "name": "drizzle-migrate",
+      "image": "${APP_DATA_DIR}/build/drizzle-migrate:latest",
+      "command": "pnpm drizzle-kit migrate",
+      "environment": {
+        "DATABASE_URL": "postgresql://metatool:m3t4t00l@metatool-postgres:5432/metatool"
+      },
+      "dependsOn": {
+        "metatool-postgres": {
+          "condition": "service_healthy"
+        }
+      }
+    }
+  ]
+}

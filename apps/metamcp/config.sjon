@@ -1,0 +1,20 @@
+{
+  "id": "metamcp",
+  "name": "MetaMCP",
+  "available": true,
+  "version": "1.0.0",
+  "tipi_version": 3,
+  "categories": ["development", "utilities", "ai"],
+  "author": "metatool-ai",
+  "short_desc": "Unified middleware MCP to manage all your MCPs with a GUI interface.",
+  "description": "MetaMCP is a unified middleware application that manages multiple Model Context Protocol (MCP) servers through an intuitive GUI interface. It acts as a central hub for all your AI tool integrations, providing workspace isolation to prevent context pollution between different projects. With MetaMCP, you can toggle tools on/off at a granular level, manage prompts and resources, and connect any MCP client like Claude Desktop or Cursor. Self-hosting with Runtipi provides enhanced privacy and reduced latency compared to cloud options.",
+  "port": 12005,
+  "source": "https://github.com/metatool-ai/metatool-app",
+  "website": "https://metamcp.com/",
+  "exposable": true,
+  "dynamic_config": true,
+  "supported_architectures": ["arm64", "amd64"],
+  "form_fields": [],
+  "created_at": 1747065600000,
+  "updated_at": 1747065600000
+}
