@@ -1,14 +1,19 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 function nowMillis() {
   return Date.now();
 }
 
+// __dirname workaround for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 function bumpConfig(appDir) {
-  const configPath = path.join('apps', appDir, 'config.json');
+  const configPath = path.join(__dirname, '..', 'apps', appDir, 'config.json');
   if (!fs.existsSync(configPath)) {
     console.warn(`No config.json found for app: ${appDir}`);
     return;
