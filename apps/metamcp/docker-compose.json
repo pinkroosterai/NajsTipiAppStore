@@ -2,7 +2,11 @@
   "services": [
     {
       "name": "metatool-web",
-      "image": "${APP_DATA_DIR}/build/metatool-web:latest",
+      "build": {
+        "context": "${APP_DATA_DIR}/build/metatool-web",
+        "dockerfile": "Dockerfile"
+      },
+      "image": "metamcp-metatool-web:latest",
       "internalPort": 3000,
       "isMain": true,
       "healthCheck": {
@@ -37,7 +41,11 @@
     },
     {
       "name": "metatool-remote-hosting",
-      "image": "${APP_DATA_DIR}/build/metatool-remote-hosting:latest",
+      "build": {
+        "context": "${APP_DATA_DIR}/build/metatool-remote-hosting",
+        "dockerfile": "Dockerfile"
+      },
+      "image": "metamcp-remote-hosting:latest",
       "internalPort": 12007,
       "volumes": [
         {
@@ -95,7 +103,11 @@
     },
     {
       "name": "drizzle-migrate",
-      "image": "${APP_DATA_DIR}/build/drizzle-migrate:latest",
+      "build": {
+        "context": "${APP_DATA_DIR}/build/drizzle-migrate",
+        "dockerfile": "Dockerfile"
+      },
+      "image": "metamcp-drizzle-migrate:latest",
       "command": "pnpm drizzle-kit migrate",
       "environment": {
         "DATABASE_URL": "postgresql://metatool:m3t4t00l@metatool-postgres:5432/metatool"
