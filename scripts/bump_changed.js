@@ -3,6 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 function nowMillis() {
   return Date.now();
@@ -28,10 +29,47 @@ function bumpConfig(appDir) {
   console.log(`Bumped tipi_version for ${appDir}`);
 }
 
-const changedApps = process.argv.slice(2);
+// Get last run commit hash from file
+const stateFile = path.join(__dirname, '.bump_changed_last_commit');
+let lastCommit = null;
+if (fs.existsSync(stateFile)) {
+  lastCommit = fs.readFileSync(stateFile, 'utf8').trim();
+}
+
+// Get current HEAD commit hash
+const currentCommit = execSync('git rev-parse HEAD').toString().trim();
+
+// Find changed files since last run
+let changedApps = [];
+if (lastCommit && lastCommit !== currentCommit) {
+  const diffOutput = execSync(`git diff --name-only ${lastCommit} ${currentCommit}`).toString();
+  const changedFiles = diffOutput.split('\n').map(f => f.trim()).filter(Boolean);
+  const appDirs = new Set();
+  for (const file of changedFiles) {
+    // Match apps/<appname>/...
+    const match = file.match(/^apps\/([^\/]+)\//);
+    if (match) {
+      appDirs.add(match[1]);
+    }
+  }
+  changedApps = Array.from(appDirs);
+} else if (!lastCommit) {
+  // First run: bump all apps
+  const appsDir = path.join(__dirname, '..', 'apps');
+  changedApps = fs.readdirSync(appsDir).filter(d => {
+    const configPath = path.join(appsDir, d, 'config.json');
+    return fs.existsSync(configPath);
+  });
+}
+
 if (changedApps.length === 0) {
-  console.log('No changed apps provided.');
+  console.log('No changed apps detected.');
+  // Still update the state file
+  fs.writeFileSync(stateFile, currentCommit);
   process.exit(0);
 }
 
 changedApps.forEach(bumpConfig);
+
+// Save current commit hash for next run
+fs.writeFileSync(stateFile, currentCommit);
