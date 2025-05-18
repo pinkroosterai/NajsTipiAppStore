@@ -3,7 +3,7 @@
   "name": "MetaMCP",
   "available": true,
   "version": "1.0.0",
-  "tipi_version": 3,
+  "tipi_version": "1",
   "categories": ["development", "utilities", "ai"],
   "author": "metatool-ai",
   "short_desc": "Unified middleware MCP to manage all your MCPs with a GUI interface.",

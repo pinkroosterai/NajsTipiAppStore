@@ -22,7 +22,11 @@
       "extraHosts": [
         "host.docker.internal:host-gateway"
       ],
-      "dependsOn": "metatool-postgres",
+      "dependsOn": {
+        "metatool-postgres": {
+          "condition": "service_healthy"
+        }
+      },
       "restart": "always"
     },
     {
