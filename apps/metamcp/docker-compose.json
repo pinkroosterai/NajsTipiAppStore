@@ -5,6 +5,12 @@
       "image": "${APP_DATA_DIR}/build/metatool-web:latest",
       "internalPort": 3000,
       "isMain": true,
+      "healthCheck": {
+        "test": "curl --fail http://localhost:3000/healthz || exit 1",
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 3
+      },
       "volumes": [
         {
           "hostPath": "${APP_DATA_DIR}/data",
@@ -46,12 +52,16 @@
       "addPorts": [
         {
           "containerPort": 12007,
-          "hostPort": 12007
+          "hostPort": 12007,
+          "tcp": true
         }
       ],
       "extraHosts": [
         "host.docker.internal:host-gateway"
       ],
+      "dependsOn": {
+        "metatool-web": { "condition": "service_healthy" }
+      },
       "restart": "always"
     },
     {
@@ -71,7 +81,8 @@
       "addPorts": [
         {
           "containerPort": 5432,
-          "hostPort": 8432
+          "hostPort": 8432,
+          "tcp": true
         }
       ],
       "healthCheck": {
@@ -93,7 +104,8 @@
         "metatool-postgres": {
           "condition": "service_healthy"
         }
-      }
+      },
+      "restart": "no"
     }
   ]
 }
